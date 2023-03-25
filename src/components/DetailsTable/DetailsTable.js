@@ -1,0 +1,95 @@
+import React from "react";
+import { makeStyles } from "@mui/styles";
+import { Theme, Card, TableBody, TableContainer, Table, TableRow, TableHead, TableCell } from "@mui/material";
+
+// import { Customer } from "../../interfaces/record";
+import useApp from "../../hooks/useApp";
+
+const useStyles = makeStyles((theme) => ({
+  root: {},
+}));
+
+
+const DetailsTable = () => {
+  const { customerRecords, speed } = useApp();
+  const [records, setRecords] = React.useState([]);
+  const classes = useStyles();
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    setRecords([]);
+    if (speed === 0) {
+      setRecords(customerRecords);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setRecords((prev) => {
+        while (prev.length !== customerRecords.length) {
+          ref.current?.scroll(0, ref.current.scrollHeight);
+          return [...prev, customerRecords[prev.length]];
+        }
+        return prev;
+      });
+    }, 500 / speed);
+
+    return () => clearInterval(interval);
+  }, [customerRecords]);
+
+  return (
+    <Card className={classes.root} sx={{ mt: 2, p: 2 }}>
+      <TableContainer ref={ref} sx={{ maxHeight: 400 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell title="Customer Number"  align="center">
+                <b>C</b>#
+              </TableCell>
+              <TableCell title="Arrival Time" align="center">
+                <b>Arrival</b>
+              </TableCell>
+              <TableCell title="Interarrival Time" align="center">
+                <b>Interarrival</b>
+              </TableCell>
+              <TableCell  title="Service Time" align="center">
+                <b>Service</b>
+              </TableCell>
+              <TableCell title="Start Time" align="center">
+                <b>Start</b>
+              </TableCell>
+              <TableCell title="End Time" align="center">
+                <b>End</b>
+              </TableCell>
+              <TableCell title="Wait Time" align="center">
+                <b>Wait</b>
+              </TableCell>
+              <TableCell title="Turnaround Time" align="center">
+                <b>TT</b>
+              </TableCell>
+              <TableCell title="Server Number" align="center">
+                <b>Server</b>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {records.map((customer, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">{index + 1}</TableCell>
+                <TableCell align="center">{customer.arrival}</TableCell>
+                <TableCell align="center">{customer.interArrival}</TableCell>
+                <TableCell align="center">{customer.serviceTime}</TableCell>
+                <TableCell align="center">{customer.startTime}</TableCell>
+                <TableCell align="center">{customer.endTime}</TableCell>
+                <TableCell align="center">{customer.waitTime}</TableCell>
+                <TableCell align="center">{customer.turnaroundTime}</TableCell>
+                <TableCell align="center">{customer.server}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Card>
+  );
+};
+
+export default DetailsTable;
